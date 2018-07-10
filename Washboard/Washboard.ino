@@ -4,9 +4,13 @@ Servo scratch;
 Servo tap; 
 
 int scratch_pos = 0;
-bool scratch_dir = false;
+bool scratch_dir = false;//false=up
 int tap_pos = 0;
 int speed_coef = 10;
+int up_stop = 90;
+int up_start = 0;
+int down_stop = 90;
+int down_start = 180;
 
 void setup() {
   scratch.attach(9);
@@ -25,17 +29,41 @@ void loop() {
   }
   else{
     if(!scratch_dir){
-      for(scratch_pos=0;scratch_pos<=180;scratch_pos+=1*speed_coef){
+      for(scratch_pos=up_start;scratch_pos<=up_stop;scratch_pos+=1*speed_coef){
         scratch.write(scratch_pos);
         delay(5);
+        if(scratch_pos + 1*speed_coef > up_stop){
+          scratch.write(up_stop);
+          break;
+        }
       }
-      scratch_dir=true;
+      if(up_stop==90){
+        up_stop = 180;
+        up_start = 90;
+        scratch_dir = false;
+      }else{
+        up_stop = 90;
+        up_start = 0;
+        scratch_dir = true;
+      }
     }else{
-      for(scratch_pos=180;scratch_pos>=0;scratch_pos-=1*speed_coef){
+      for(scratch_pos=down_start;scratch_pos>=down_stop;scratch_pos-=1*speed_coef){
         scratch.write(scratch_pos);
         delay(5);
+        if(scratch_pos + 1*speed_coef < down_stop){
+          scratch.write(down_stop);
+          break;
+        }
       }
-      scratch_dir=false;
+      if(down_stop==90){
+        down_stop = 0;
+        down_start = 90;
+        scratch_dir = true;
+      }else{
+        down_stop = 90;
+        down_start = 180;
+        scratch_dir = false;
+      }
     }
     delay(10);
     
